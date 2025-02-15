@@ -1,15 +1,19 @@
-const { app, BrowserWindow, ipcMain, systemPreferences } = require('electron');
-const path = require('path');
+import { app, BrowserWindow, ipcMain, systemPreferences } from 'electron';
+import { Hono } from 'hono'
+import { serve } from '@hono/node-server'
 
-// Request camera permissions early
+const server = new Hono()
+
 app.on('ready', () => {
   // Request camera and microphone permissions
   systemPreferences.askForMediaAccess('camera');
   systemPreferences.askForMediaAccess('microphone');
 });
 
+let mainWindow = null;
+
 function createWindow() {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     transparent: true,
@@ -34,11 +38,24 @@ app.on('window-all-closed', () => {
   }
 });
 
+
+
+server.post('/webhook', async (c) => {
+
+  const jsonBody = await c.req.json();
+  mainWindow?.webContents.send('webhook-event', jsonBody);
+  return c.json({ message: 'Webhook received' });
+})
+
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
 });
+
+serve(server, (info) => {
+  console.log(`Listening on http://localhost:${info.port}`) // Listening on http://localhost:3000
+})
 
 // Handle API calls
 ipcMain.handle('create-conversation', async (event, token) => {

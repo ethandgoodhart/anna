@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { createCloudflareContext, setupRemixHandler } from "~/utils/handlers";
+import { createCloudflareContext, setupRemixHandler } from "web/utils/handlers";
 
 const app = new Hono<{ Bindings: Env }>();
 

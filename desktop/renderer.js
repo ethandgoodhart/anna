@@ -170,7 +170,15 @@ async function startCall() {
         // document.getElementById('startButton').textContent = 'Loading...';
         
         currentConversation = await ipcRenderer.invoke('create-conversation', token);
-        
+
+
+        ipcRenderer.on('webhook-event', (event, data) => {
+            console.log(data, event)
+            // Update UI elements
+            document.getElementById('status').innerHTML = data.status
+            document.getElementById('message').innerHTML = data.message
+          })
+
         // Initialize Daily.co
         daily = DailyIframe.createCallObject();
         

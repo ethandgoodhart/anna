@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Tavus Conversational Video Interface with Electron",
   "main": "main.js",
+  "type": "module",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
@@ -19,10 +20,12 @@
     }
   },
   "dependencies": {
-    "@daily-co/daily-js": "^0.73.0"
+    "@daily-co/daily-js": "^0.73.0",
+    "@hono/node-server": "^1.13.8"
   },
   "devDependencies": {
     "electron": "^29.1.0",
-    "electron-builder": "^24.12.0"
+    "electron-builder": "^24.12.0",
+    "tsx": "^4.19.2"
   }
 }
