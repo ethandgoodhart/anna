@@ -4,9 +4,12 @@ import os
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import List, Optional
-import time
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
+
 
 # Define a Pydantic model for messages
 class Message(BaseModel):
@@ -18,18 +21,27 @@ class Message(BaseModel):
     cache_roomname: Optional[str]
     group_chat_name: Optional[str]
 
+
 # Define a Pydantic model for the message sending request
 class SendMessageRequest(BaseModel):
     phone_number: str
     message_body: str
 
 
-# Function to send an iMessage using osascript
 def send_imessage(phone_number, message_body):
-    os.system('osascript send_imessage.applescript {} "{}"'.format(phone_number, message_body))
+    clean_phone = "".join(filter(lambda x: x.isdigit() or x == "+", phone_number))
+    script_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "send_imessage.applescript"
+    )
 
+    command = f'osascript "{script_path}" "{clean_phone}" "{message_body}"'
 
-# Function to retrieve chat mappings from the database
+    result = os.system(command)
+    if result != 0:
+        raise Exception(f"Failed to send message to {phone_number}")
+    else:
+        print(f"Message sent to {phone_number}")
+
 def get_chat_mapping(db_location):
     conn = sqlite3.connect(db_location)
     cursor = conn.cursor()
@@ -43,9 +55,7 @@ def get_chat_mapping(db_location):
 
     return mapping
 
-
-# Function to read messages from the database
-def read_messages(db_location, n=None, self_number='Me', human_readable_date=True):
+def read_messages(db_location, n=None, self_number="Me", human_readable_date=True):
     conn = sqlite3.connect(db_location)
     cursor = conn.cursor()
     query = """
@@ -56,20 +66,22 @@ def read_messages(db_location, n=None, self_number='Me', human_readable_date=Tru
     if n is not None:
         query += f" ORDER BY message.date DESC LIMIT {n}"
     results = cursor.execute(query).fetchall()
-    
+
     messages = []
 
     for result in results:
-        rowid, date, text, attributed_body, handle_id, is_from_me, cache_roomname = result
+        rowid, date, text, attributed_body, handle_id, is_from_me, cache_roomname = (
+            result
+        )
 
         phone_number = self_number if handle_id is None else handle_id
 
         if text is not None:
             body = text
-        elif attributed_body is None: 
+        elif attributed_body is None:
             continue
-        else: 
-            attributed_body = attributed_body.decode('utf-8', errors='replace')
+        else:
+            attributed_body = attributed_body.decode("utf-8", errors="replace")
             if "NSNumber" in str(attributed_body):
                 attributed_body = str(attributed_body).split("NSNumber")[0]
                 if "NSString" in attributed_body:
@@ -80,11 +92,13 @@ def read_messages(db_location, n=None, self_number='Me', human_readable_date=Tru
                         body = attributed_body
 
         if human_readable_date:
-            date_string = '2001-01-01'
-            mod_date = datetime.datetime.strptime(date_string, '%Y-%m-%d')
-            unix_timestamp = int(mod_date.timestamp())*1000000000
-            new_date = int((date+unix_timestamp)/1000000000)
-            date = datetime.datetime.fromtimestamp(new_date).strftime("%Y-%m-%d %H:%M:%S")
+            date_string = "2001-01-01"
+            mod_date = datetime.datetime.strptime(date_string, "%Y-%m-%d")
+            unix_timestamp = int(mod_date.timestamp()) * 1000000000
+            new_date = int((date + unix_timestamp) / 1000000000)
+            date = datetime.datetime.fromtimestamp(new_date).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
 
         mapping = get_chat_mapping(db_location)
 
@@ -94,8 +108,16 @@ def read_messages(db_location, n=None, self_number='Me', human_readable_date=Tru
             mapped_name = None
 
         messages.append(
-            {"rowid": rowid, "date": date, "body": body, "phone_number": phone_number, "is_from_me": is_from_me,
-             "cache_roomname": cache_roomname, 'group_chat_name': mapped_name})
+            {
+                "rowid": rowid,
+                "date": date,
+                "body": body,
+                "phone_number": phone_number,
+                "is_from_me": is_from_me,
+                "cache_roomname": cache_roomname,
+                "group_chat_name": mapped_name,
+            }
+        )
 
     conn.close()
     return messages
@@ -103,7 +125,9 @@ def read_messages(db_location, n=None, self_number='Me', human_readable_date=Tru
 
 # FastAPI endpoint to read messages
 @app.get("/messages/", response_model=List[Message])
-async def get_messages(db_location: str = "/Users/keval/Library/Messages/chat.db", n: Optional[int] = 10):
+async def get_messages(
+    db_location: str = os.getenv("IMESSAGE_DB_LOCATION"), n: Optional[int] = 10
+):
     return read_messages(db_location, n)
 
 
@@ -115,7 +139,10 @@ async def send_message(request: SendMessageRequest):
 
 
 @app.get("/check_new_messages/")
-async def check_new_messages(db_location: str = "/Users/keval/Library/Messages/chat.db", last_rowid: Optional[int] = None):
+async def check_new_messages(
+    db_location: str = os.getenv("IMESSAGE_DB_LOCATION"),
+    last_rowid: Optional[int] = None,
+):
     messages = read_messages(db_location, n=1)
     if messages:
         latest_message = messages[0]
@@ -123,8 +150,10 @@ async def check_new_messages(db_location: str = "/Users/keval/Library/Messages/c
             return latest_message
     return {"message": "No new messages"}
 
-# Function to print the messages (for testing)
 def print_messages(messages):
     for message in messages:
         sender_receiver = "Me" if message["is_from_me"] else message["phone_number"]
         print(f"{sender_receiver}: {message['body']} ({message['date']})")
+
+if __name__ == "__main__":
+    print(get_messages())
