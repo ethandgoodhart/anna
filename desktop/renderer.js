@@ -1,5 +1,6 @@
 const { ipcRenderer } = require('electron');
 const DailyIframe = require('@daily-co/daily-js');
+const { createRoot } = require('react-dom/client');
 
 let daily = null;
 let currentConversation = null;
@@ -289,10 +290,9 @@ async function handleLeaveCall() {
         
         // Reset UI
         document.getElementById('callContainer').style.display = 'none';
-        document.getElementById('tokenForm').style.display = 'flex';
+        document.getElementById('startForm').style.display = 'flex';
         document.getElementById('startButton').disabled = false;
         document.getElementById('startButton').textContent = 'Start Video Call';
-        document.getElementById('token').value = '';
     }
 }
 
@@ -307,9 +307,25 @@ function toggleMicrophone() {
 // Event Listeners
 document.getElementById('leaveCall').addEventListener('click', handleLeaveCall);
 document.getElementById('toggleMic').addEventListener('click', toggleMicrophone);
-
-// Start call
-startCall();
+document.getElementById('startButton').addEventListener('click', async () => {
+    const startButton = document.getElementById('startButton');
+    const startForm = document.getElementById('startForm');
+    const callContainer = document.getElementById('callContainer');
+    
+    startButton.disabled = true;
+    startButton.textContent = 'Loading...';
+    
+    try {
+        await startCall();
+        startForm.style.display = 'none';
+        callContainer.style.display = 'block';
+    } catch (error) {
+        console.error('Failed to start call:', error);
+        startButton.disabled = false;
+        startButton.textContent = 'Start Video Call';
+        alert('Failed to start call: ' + error.message);
+    }
+});
 
 // Cleanup on window unload
 window.addEventListener('unload', () => {

@@ -24,6 +24,24 @@ function createWindow() {
     }
   });
 
+  // Add CSP headers before loading the file
+  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.daily.co https://*.sentry.io; " +
+          "connect-src 'self' https://*.daily.co https://*.sentry.io wss://*.daily.co https://tavusapi.com; " +
+          "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.daily.co; " +
+          "style-src 'self' 'unsafe-inline'; " +
+          "img-src 'self' data: blob: https://*.daily.co; " +
+          "media-src 'self' https://*.daily.co blob:; " +
+          "frame-src 'self' https://*.daily.co;"
+        ]
+      }
+    });
+  });
+
   mainWindow.loadFile('index.html');
   
   // Uncomment to open DevTools on startup
