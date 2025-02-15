@@ -406,10 +406,24 @@ function App() {
 
   // Clean up and end the current call
   const handleLeaveCall = () => {
-    DailyCall?.leave();
-    endConversation(conversation!.conversation_id);
-    setConversation(null);
+    try {
+      DailyCall?.leave();
+    } finally {
+      if (conversation) {
+        endConversation(conversation.conversation_id);
+        setConversation(null);
+      }
+    }
   };
+
+  // Ensure conversation is ended when component unmounts
+  useEffect(() => {
+    return () => {
+      if (conversation) {
+        endConversation(conversation.conversation_id);
+      }
+    };
+  }, [conversation]);
 
   return (
     <main>
