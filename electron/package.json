@@ -1,0 +1,28 @@
+{
+  "name": "tavus-electron-app",
+  "version": "1.0.0",
+  "description": "Tavus Conversational Video Interface with Electron",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "mac": {
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "extendInfo": {
+        "NSCameraUsageDescription": "This app needs access to camera to enable video calls",
+        "NSMicrophoneUsageDescription": "This app needs access to microphone to enable audio in calls",
+        "NSCameraUseContinuityCameraDeviceType": true
+      }
+    }
+  },
+  "dependencies": {
+    "@daily-co/daily-js": "^0.73.0"
+  },
+  "devDependencies": {
+    "electron": "^29.1.0",
+    "electron-builder": "^24.12.0"
+  }
+}
