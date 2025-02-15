@@ -31,8 +31,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <meta httpEquiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' data: blob:; style-src * 'unsafe-inline' data: blob:; img-src * data: blob:; font-src * data: blob:; connect-src * data: blob:; media-src * data: blob:; object-src * data: blob:; child-src * data: blob:; frame-src * data: blob:;" />
       </head>
-      <body>
+      <body className="bg-black text-white">
         {children}
         <ScrollRestoration />
         <Scripts />

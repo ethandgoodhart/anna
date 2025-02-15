@@ -161,7 +161,9 @@ export const Video: React.FC<{ id: string }> = ({ id }) => {
   // Monitor video element for when it's ready to play
   useEffect(() => {
     const video = videoRef.current;
+    console.log("video", video);
     if (video) {
+      console.log("video", video);
       const checkVideoReady = () => {
         // readyState values:
         // 0 = HAVE_NOTHING - no data available
@@ -174,6 +176,7 @@ export const Video: React.FC<{ id: string }> = ({ id }) => {
           video.removeEventListener("canplay", checkVideoReady);
         }
       };
+      console.log("video.readyState", video.readyState);
       video.addEventListener("canplay", checkVideoReady);
       return () => video.removeEventListener("canplay", checkVideoReady);
     }
@@ -181,6 +184,8 @@ export const Video: React.FC<{ id: string }> = ({ id }) => {
 
   // Main render loop that applies the chroma key effect
   useEffect(() => {
+    console.log("isVideoReady", isVideoReady);
+    console.log("webGLContext", webGLContext);
     if (!isVideoReady || !webGLContext) return;
 
     const video = videoRef.current;
@@ -234,7 +239,7 @@ export const Video: React.FC<{ id: string }> = ({ id }) => {
         // Configure chroma key parameters
         gl.uniform1i(imageLocation, 0);
         gl.uniform3f(keyColorLocation, 3 / 255, 255 / 255, 156 / 255); // Green screen RGB color
-        gl.uniform1f(thresholdLocation, 0.3); // Sensitivity of color matching
+        gl.uniform1f(thresholdLocation, 0.§0); // Sensitivity of color matching
 
         // Render the processed frame
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -297,6 +302,10 @@ export const Call = ({ onLeave }: { onLeave: () => void }) => {
   const toggleMicrophone = () => {
     daily?.setLocalAudio(!isMicEnabled);
   };
+
+  useEffect(() => {
+    console.log("remoteParticipantIds", remoteParticipantIds);
+  }, [remoteParticipantIds]);
 
   return (
     <div

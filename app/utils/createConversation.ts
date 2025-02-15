@@ -5,13 +5,11 @@ export const createConversation = async (): Promise<IConversation> => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": "de1e8457a8404e15a25feff77c20ff6a",
+      "x-api-key": "a335c04a5be24585af0ddae7e08c40e5",
     },
     body: JSON.stringify({
-      // Stock Demo Persona
       persona_id: "p9a95912",
       properties: {
-        // Apply greenscreen to the background
         apply_greenscreen: true,
       },
     }),
