@@ -8,6 +8,8 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 py-imessage = "^1.7"
+fastapi = "^0.115.8"
+uvicorn = "^0.34.0"
 
 
 [build-system]
