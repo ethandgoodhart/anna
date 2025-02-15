@@ -239,7 +239,7 @@ export const Video: React.FC<{ id: string }> = ({ id }) => {
         // Configure chroma key parameters
         gl.uniform1i(imageLocation, 0);
         gl.uniform3f(keyColorLocation, 3 / 255, 255 / 255, 156 / 255); // Green screen RGB color
-        gl.uniform1f(thresholdLocation, 0.§0); // Sensitivity of color matching
+        gl.uniform1f(thresholdLocation, 0.5); // Sensitivity of color matching
 
         // Render the processed frame
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);

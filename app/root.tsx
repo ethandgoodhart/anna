@@ -33,7 +33,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
         <meta httpEquiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' data: blob:; style-src * 'unsafe-inline' data: blob:; img-src * data: blob:; font-src * data: blob:; connect-src * data: blob:; media-src * data: blob:; object-src * data: blob:; child-src * data: blob:; frame-src * data: blob:;" />
       </head>
-      <body className="bg-black text-white">
+      <body className="bg-transparent text-black">
         {children}
         <ScrollRestoration />
         <Scripts />

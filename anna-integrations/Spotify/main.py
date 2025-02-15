@@ -7,6 +7,7 @@ from methods import (
     next_track,
     previous_track,
     play_random_playlist,
+    play_playlist_from_query,
 )
 import fastapi
 
@@ -75,6 +76,13 @@ async def previous_track_endpoint():
 async def play_random_playlist_endpoint():
     await play_random_playlist(spotify=sp)
     return {"message": "Playing random playlist"}
+
+
+@app.get("/play-playlist")
+async def play_playlist_endpoint(query: str):
+    print(query)
+    await play_playlist_from_query(spotify=sp, query=query)
+    return {"message": "Playing playlist"}
 
 
 if __name__ == "__main__":
