@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 from exa_py import Exa
 import os
 
@@ -6,9 +6,9 @@ exa_client: Exa = Exa(api_key=os.getenv("EXA_API_KEY"))
 
 def search_web(
     query,
-    num_results=10,
+    num_results=5,
     search_type: Literal["neural", "keyword"] = "neural",
-    category: Literal[
+    category: Optional[Literal[
         "company",
         "research paper",
         "news",
@@ -18,7 +18,7 @@ def search_web(
         "personal site",
         "linkedin profile",
         "financial report",
-    ] = "web",
+    ]] = None,
 ):
     result = exa_client.search_and_contents(
         query,
