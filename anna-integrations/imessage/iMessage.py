@@ -1,13 +1,35 @@
 import sqlite3
 import datetime
-import time
 import os
-from py_imessage import imessage
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import List, Optional
+import time
 
+app = FastAPI()
+
+# Define a Pydantic model for messages
+class Message(BaseModel):
+    rowid: int
+    date: str
+    body: str
+    phone_number: str
+    is_from_me: bool
+    cache_roomname: Optional[str]
+    group_chat_name: Optional[str]
+
+# Define a Pydantic model for the message sending request
+class SendMessageRequest(BaseModel):
+    phone_number: str
+    message_body: str
+
+
+# Function to send an iMessage using osascript
 def send_imessage(phone_number, message_body):
     os.system('osascript send_imessage.applescript {} "{}"'.format(phone_number, message_body))
 
 
+# Function to retrieve chat mappings from the database
 def get_chat_mapping(db_location):
     conn = sqlite3.connect(db_location)
     cursor = conn.cursor()
@@ -22,6 +44,7 @@ def get_chat_mapping(db_location):
     return mapping
 
 
+# Function to read messages from the database
 def read_messages(db_location, n=None, self_number='Me', human_readable_date=True):
     conn = sqlite3.connect(db_location)
     cursor = conn.cursor()
@@ -78,35 +101,30 @@ def read_messages(db_location, n=None, self_number='Me', human_readable_date=Tru
     return messages
 
 
+# FastAPI endpoint to read messages
+@app.get("/messages/", response_model=List[Message])
+async def get_messages(db_location: str = "/Users/keval/Library/Messages/chat.db", n: Optional[int] = 10):
+    return read_messages(db_location, n)
+
+
+# FastAPI endpoint to send an iMessage
+@app.post("/send_message/")
+async def send_message(request: SendMessageRequest):
+    send_imessage(request.phone_number, request.message_body)
+    return {"status": "Message sent successfully"}
+
+
+@app.get("/check_new_messages/")
+async def check_new_messages(db_location: str = "/Users/keval/Library/Messages/chat.db", last_rowid: Optional[int] = None):
+    messages = read_messages(db_location, n=1)
+    if messages:
+        latest_message = messages[0]
+        if last_rowid is None or latest_message["rowid"] > last_rowid:
+            return latest_message
+    return {"message": "No new messages"}
+
+# Function to print the messages (for testing)
 def print_messages(messages):
     for message in messages:
         sender_receiver = "Me" if message["is_from_me"] else message["phone_number"]
         print(f"{sender_receiver}: {message['body']} ({message['date']})")
-
-
-def check_new_messages(db_location, interval=5):
-    last_rowid = None
-    while True:
-        messages = read_messages(db_location, n=1)
-        if messages:
-            latest_message = messages[0]
-            if last_rowid is None or latest_message["rowid"] > last_rowid:
-                print_messages([latest_message])
-                last_rowid = latest_message["rowid"]
-        time.sleep(interval)
-
-
-# ask the user for the location of the database
-db_location = "/Users/keval/Library/Messages/chat.db"
-
-# # ask the user for the number of messages to read
-# n = input("Enter the number of messages to read: ")
-
-# # Remove the 2 lines below after testing -- they are for testing only
-# output = read_messages(db_location, n)
-# print_messages(output)
-# # Remove the 2 lines above after testing -- they are for testing only
-
-# Start checking for new messages
-# check_new_messages(db_location)
-send_imessage('4046635506', 'another imessage')
