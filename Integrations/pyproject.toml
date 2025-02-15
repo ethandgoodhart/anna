@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "imessageintegration"
+version = "0.1.0"
+description = ""
+authors = ["Keval Shah <keval.arhan@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+py-imessage = "^1.7"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
