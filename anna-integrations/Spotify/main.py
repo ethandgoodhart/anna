@@ -1,7 +1,7 @@
 from spotipy.oauth2 import SpotifyOAuth
 import os
 import spotipy
-from methods import (
+from .methods import (
     play_track,
     get_track_uri,
     next_track,
@@ -10,6 +10,9 @@ from methods import (
     play_playlist_from_query,
 )
 import fastapi
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = fastapi.FastAPI()
 
