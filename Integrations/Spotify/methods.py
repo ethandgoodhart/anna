@@ -1,5 +1,14 @@
+import os
 import random
 from spotipy import Spotify
+import openai
+from pydantic import BaseModel
+
+class PlaylistId(BaseModel):
+    playlist_id: str
+
+def get_openai_client():
+    return openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 async def play_track(spotify: Spotify, uri: str) -> Spotify:
@@ -106,3 +115,25 @@ async def play_random_playlist(spotify: Spotify) -> Spotify:
     return await play_playlist(
         spotify, playlist_ids[random.randint(0, len(playlist_ids) - 1)]
     )
+
+async def play_playlist_from_query(spotify: Spotify, query: str) -> Spotify:
+    """
+    plays a playlist with the given query
+    """
+    client = get_openai_client()
+    
+    user_playlists, user_playlist_ids = await get_user_playlists(spotify)
+    
+    playlist_mappings = "\n".join([f"{name}: {id}" for name, id in zip(user_playlists, user_playlist_ids)])
+
+    res = client.beta.chat.completions.parse(
+        model="gpt-4o-mini",
+        messages=[{
+            "role": "user", 
+            "content": f"You are a playlist selector. Given a query and a list of playlists with their IDs, return the ID of the playlist that best matches the query. Only return the playlist ID, nothing else.\n\nQuery: {query}\n\nPlaylists:\n{playlist_mappings}"
+            },
+        ],
+        response_format=PlaylistId,
+    )
+
+    return await play_playlist(spotify, res.choices[0].message.parsed.playlist_id)
