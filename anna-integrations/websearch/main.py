@@ -14,7 +14,7 @@ exa_client: Exa = Exa(api_key=os.getenv("EXA_API_KEY"))
 def search_web(
     query,
     num_results=5,
-    search_type: Literal["neural", "keyword"] = "neural",
+    search_type: Literal["neural", "keyword", "auto"] = "auto",
     category: Optional[
         Literal[
             "company",

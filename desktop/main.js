@@ -70,7 +70,7 @@ ipcMain.handle('create-conversation', async (event, token) => {
         'x-api-key': "a335c04a5be24585af0ddae7e08c40e5"
       },
       body: JSON.stringify({
-        persona_id: 'pd25be3280bb',
+        persona_id: 'p8352baf4a51', 
         replica_id: "ra32c0504006",
         properties: {
           max_call_duration: 60*15,

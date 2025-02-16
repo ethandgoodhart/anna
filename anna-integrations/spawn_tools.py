@@ -208,11 +208,9 @@ url = "https://tavusapi.com/v2/personas"
 payload = {
     "layers": {
         "stt": {
-            "participant_interrupt_sensitivity": "medium",
-            "stt_engine": "tavus-advanced",
-            "participant_pause_sensitivity": "medium",
-            "smart_turn_detection": True,
-            "hotwords": "ethan or anna"
+            "participant_interrupt_sensitivity": "high",
+            "stt_engine": "tavus-turbo", 
+            "participant_pause_sensitivity": "high"
         },
         "llm": {
             "model": "gpt-4o-mini",

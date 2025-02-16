@@ -10,6 +10,8 @@ const Widgets = () => {
         setNotifications(prev => [...prev, { type: 'music', data, timestamp: Date.now() }]);
       } else if (serviceName === 'notification') {
         setNotifications(prev => [...prev, { type: 'notification', data, timestamp: Date.now() }]);
+      } else if (serviceName === 'websearch') {
+        setNotifications(prev => [...prev, { type: 'websearch', data, timestamp: Date.now() }]);
       }
     };
 
@@ -121,6 +123,18 @@ const Widgets = () => {
                   albumArt={notification.data.albumArt}
                   style={{ transform }}
                 />
+              </div>
+            );
+          } else if (notification.type === 'websearch') {
+            const sources = notification.data.results.map(result => ({
+              title: result.title,
+              url: result.url,
+              favicon: result.favicon || 'https://storage.googleapis.com/tempo-public-images/figma-exports%2Fgithub%7C63950637-1739706527303-node-33%3A102-1739706526857.png'
+            })).slice(0, 4);
+
+            return (
+              <div key={notification.timestamp} className="notification-enter">
+                <SourcesNotification sources={sources} />
               </div>
             );
           }
@@ -337,6 +351,83 @@ function MusicPlayerNotification({
     </div>
   );
 }
+
+const SourcesNotification = ({sources, className}) => {
+  return (
+    <div
+      className={
+        "hologram-effect relative w-[551px] h-[241px] p-8 rounded-[40px] bg-[#1c1c1c]/50 backdrop-blur-[50px]"
+      }
+      style={{
+        transform: "translateZ(40px) rotateX(5deg)",
+        boxShadow: "0 25px 60px rgba(0,0,0,0.5), 0 0 70px rgba(0,255,255,0.1) inset",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        transformStyle: "preserve-3d",
+        backfaceVisibility: "hidden",
+        border: "1px solid rgba(0,255,255,0.1)",
+        animation: "glow 3s ease-in-out infinite"
+      }}
+    >
+      <h2 className="text-2xl text-white font-bold font-['SF Pro'] mb-4">
+        Sources
+      </h2>
+
+      <div className="flex gap-4">
+        {/* Left Column */}
+        <div className="flex flex-col gap-2">
+          {sources.slice(0, 2).map((source, index) => (
+            <div
+              key={index}
+              className="w-[236px] h-[69px] bg-[#4e4e4e]/50 rounded-[10px] backdrop-blur-[100px] p-2"
+            >
+              <div className="flex flex-col gap-1">
+                <p className="text-sm text-white font-['SF Pro'] line-clamp-2">
+                  {source.title}
+                </p>
+                <div className="flex items-center gap-2">
+                  <img
+                    src={source.favicon}
+                    alt="Site favicon"
+                    className="w-[15px] h-[15px] rounded-full"
+                  />
+                  <span className="text-[11px] text-[#9f9f9f] font-['SF Pro']">
+                    {source.url}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Right Column */}
+        <div className="flex flex-col gap-2">
+          {sources.slice(2, 4).map((source, index) => (
+            <div
+              key={index}
+              className="w-[236px] h-[69px] bg-[#4e4e4e]/50 rounded-[10px] backdrop-blur-[100px] p-2"
+            >
+              <div className="flex flex-col gap-1">
+                <p className="text-sm text-white font-['SF Pro'] line-clamp-2">
+                  {source.title}
+                </p>
+                <div className="flex items-center gap-2">
+                  <img
+                    src={source.favicon}
+                    alt="Site favicon"
+                    className="w-[15px] h-[15px] rounded-full"
+                  />
+                  <span className="text-[11px] text-[#9f9f9f] font-['SF Pro']">
+                    {source.url}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const root = ReactDOM.createRoot(document.getElementById("react-container"));
 root.render(<Widgets />);
