@@ -27,6 +27,7 @@ function_mapping = {
     "previous_track": "spotify",
     "play_random_playlist": "spotify",
     "play_playlist": "spotify",
+    "pause_track": "spotify",
     "search": "websearch",
     "send_message": "imessage",
     "check_new_messages": "imessage",
