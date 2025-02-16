@@ -1,14 +1,14 @@
 import requests
 import os
 from dotenv import load_dotenv
-import time
 load_dotenv()
 
 async def make_room():
     url = "https://tavusapi.com/v2/conversations"
 
     payload = {
-        "persona_id": "p9a95912",
+        "persona_id": "p91850b706d1",
+        "replica_id": "rcefb7292e",
         "conversation_name": "A Meeting with Hassaan",
         "conversational_context": "You are about to talk to Hassaan, one of the cofounders of Tavus. He loves to talk about AI, startups, and racing cars.",
         "custom_greeting": "Hey there Hassaan, long time no see!",

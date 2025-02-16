@@ -39,18 +39,23 @@ NGROK_URL = os.getenv("NGROK_URL", "")
 
 def request_handler(route: str, data: dict):
     service = function_mapping[route]
+    # Convert spaces to %20 in track name if present
+    if "track_name" in data:
+        data["track_name"] = data["track_name"].replace(" ", "%20")
+        
     res = requests.get(
         f"http://localhost:8000/{service}/{route.replace('_', '-')}", params=data
     )
     data = res.json()
     print(data)
 
+
     res_data = {
         "event": "route",
         "data": res.json(),
     }
 
-    llm_string = "Successfully made a request to " + route + " "
+    llm_string = f"Successfully made a request to {route}"
 
     chunk = ChatCompletionChunk(
         **{
@@ -87,17 +92,15 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 @app.post("/chat/completions")
 async def chat_completions(request: Request):
-    # room_url = get_conversation_url()
+    room_url = get_conversation_url()
     try:
         global call_client
         if not call_client:
             try:
                 Daily.init()
                 call_client = CallClient()
-
-                #TODO: join Tavus room
-                # call_client.join(room_url)
-                # print(f"Joined room: {room_url}")
+                call_client.join(room_url)
+                print(f"Joined room: {room_url}")
             except Exception as e:
                 print(f"Error joining room: {e}")
                 raise
@@ -151,7 +154,60 @@ async def chat_completions(request: Request):
                                 )
                                 print(f"SENDING APP MESSAGE: {app_message}")
                                 call_client.send_app_message(app_message)
+
+                                # # Where the TODO comment was - Format response for UI
+                                # formatted_response = {}
+                                # if current_function in function_mapping:
+                                #     service = function_mapping[current_function]
+                                    
+                                #     if service == "spotify":
+                                #         formatted_response = {
+                                #             "type": "music",
+                                #             "data": {
+                                #                 "songTitle": app_message["data"].get("track_name", "Unknown Track"),
+                                #                 "artist": app_message["data"].get("artist_name", "Unknown Artist"),
+                                #                 "currentTime": "0:00",
+                                #                 "duration": app_message["data"].get("duration", "0:00"),
+                                #                 "progress": app_message["data"].get("progress_ms", 0) / app_message["data"].get("duration_ms", 1) * 100 if app_message["data"].get("duration_ms") else 0,
+                                #                 "albumArt": app_message["data"].get("album_art", "default_album_art_url")
+                                #             }
+                                #         }
+                                #     elif service == "imessage":
+                                #         formatted_response = {
+                                #             "type": "notification",
+                                #             "data": {
+                                #                 "userName": app_message["data"].get("sender", "Unknown User"),
+                                #                 "message": app_message["data"].get("message", "No message content"),
+                                #                 "notificationCount": app_message["data"].get("unread_count", 1)
+                                #             }
+                                #         }
+                                #     elif service == "websearch":
+                                #         formatted_response= {
+                                #             "type": "websearch",
+                                #             "data": {
+                                                
+                                #             }
+                                #         }
+                                    
+                                #     # Update app_message with formatted response
+                                #     app_message["data"] = formatted_response
+                                    
+                                #     # Send the formatted message through the call client
+                                #     # Send webhook to notify UI of updates
+                                #     try:
+                                #         requests.post("http://localhost:8787/webhook", json=app_message)
+                                #     except Exception as e:
+                                #         print(f"Failed to send webhook: {e}")
+
                                 yield f"data: {llm_response.model_dump_json()}\n\n"
+
+                                # TODO: Send webhook here with function execution results
+                                # Example webhook data could include:
+                                # - current_function
+                                # - function_args
+                                # - app_message
+                                # - llm_response
+                                print(current_function, function_args, app_message, llm_response)
 
                                 # Add the tool call result back to messages and continue the conversation
                                 messages.append(
