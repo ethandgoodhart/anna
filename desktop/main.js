@@ -39,11 +39,13 @@ app.on('window-all-closed', () => {
 });
 
 
-
 server.post('/webhook', async (c) => {
-
   const jsonBody = await c.req.json();
-  mainWindow?.webContents.send('webhook-event', jsonBody);
+  const { type, data } = jsonBody.data;
+  mainWindow?.webContents.send('webhook-event', {
+    serviceName: type,
+    data: data
+  });
   return c.json({ message: 'Webhook received' });
 })
 
@@ -67,7 +69,8 @@ ipcMain.handle('create-conversation', async (event, token) => {
         'x-api-key': "a335c04a5be24585af0ddae7e08c40e5"
       },
       body: JSON.stringify({
-        persona_id: 'p9a95912',
+        persona_id: 'p91850b706d1',
+        replica_id: "r315bff4de",
         properties: {
           apply_greenscreen: true
         }
@@ -75,7 +78,8 @@ ipcMain.handle('create-conversation', async (event, token) => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const json = await response.json();
+      throw new Error(`HTTP error! status: ${response.status}, message: ${JSON.stringify(json)}`);
     }
 
     return await response.json();

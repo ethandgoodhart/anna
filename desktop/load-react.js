@@ -1,3 +1,9 @@
+const { ipcRenderer } = require('electron');
+
+ipcRenderer.on('webhook-event', (event, { serviceName, data }) => {
+  console.log(serviceName, data);
+});
+
 const NotificationCard = ({
   userName = "Ethan Goodhart Stanford",
   message = "Yoo do you wanna hike the dish?",
