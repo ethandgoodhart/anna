@@ -24,7 +24,7 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile('index.test.html');
+  mainWindow.loadFile('index.html');
   
   // Uncomment to open DevTools on startup
   // mainWindow.webContents.openDevTools();
