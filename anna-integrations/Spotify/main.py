@@ -83,7 +83,6 @@ async def play_random_playlist_endpoint():
 
 @app.get("/play-playlist")
 async def play_playlist_endpoint(query: str):
-    print(query)
     await play_playlist_from_query(spotify=sp, query=query)
     return {"message": "Playing playlist"}
 

@@ -92,17 +92,15 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 @app.post("/chat/completions")
 async def chat_completions(request: Request):
-    # room_url = get_conversation_url()
+    room_url = get_conversation_url()
     try:
         global call_client
         if not call_client:
             try:
                 Daily.init()
                 call_client = CallClient()
-
-                #TODO: join Tavus room
-                # call_client.join(room_url)
-                # print(f"Joined room: {room_url}")
+                call_client.join(room_url)
+                print(f"Joined room: {room_url}")
             except Exception as e:
                 print(f"Error joining room: {e}")
                 raise
