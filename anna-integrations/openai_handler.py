@@ -31,6 +31,7 @@ function_mapping = {
     "send_message": "imessage",
     "check_new_messages": "imessage",
     "get_messages": "imessage",
+    "call": "phone",
 }
 
 app = FastAPI()
@@ -46,6 +47,7 @@ def request_handler(route: str, data: dict):
     res = requests.get(
         f"http://localhost:8000/{service}/{route.replace('_', '-')}", params=data
     )
+
     data = res.json()
     print(data)
 
