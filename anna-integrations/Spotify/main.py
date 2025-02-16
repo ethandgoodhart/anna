@@ -8,6 +8,7 @@ from .methods import (
     previous_track,
     play_random_playlist,
     play_playlist_from_query,
+    pause_track,
 )
 import fastapi
 from dotenv import load_dotenv
@@ -78,14 +79,20 @@ async def previous_track_endpoint():
 
 @app.get("/play-random-playlist")
 async def play_random_playlist_endpoint():
-    await play_random_playlist(spotify=sp)
-    return {"message": "Playing random playlist"}
+    res = await play_random_playlist(spotify=sp)
+    return res
 
 
 @app.get("/play-playlist")
 async def play_playlist_endpoint(query: str):
-    await play_playlist_from_query(spotify=sp, query=query)
-    return {"message": "Playing playlist"}
+    res = await play_playlist_from_query(spotify=sp, query=query)
+    return res
+
+
+@app.get("/pause-track")
+async def pause_track_endpoint():
+    res = await pause_track(spotify=sp)
+    return res
 
 
 if __name__ == "__main__":

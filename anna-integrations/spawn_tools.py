@@ -184,7 +184,14 @@ TOOLS = [
                 "required": ["phone_number"]
             }
         }
-    }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "pause_track",
+            "description": "Pause the current track on Spotify",
+        },
+    },
 ]
 
 

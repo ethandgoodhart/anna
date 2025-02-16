@@ -4,7 +4,7 @@ import os
 
 
 async def call_openai_endpoint(data: dict):
-    url = "http://localhost:8080"
+    url = "https://f54f-2607-f6d0-ced-5bb-9d89-5c92-9244-66fb.ngrok-free.app"
 
     client = OpenAI(api_key="hi", base_url=url)
 
@@ -23,5 +23,5 @@ async def call_openai_endpoint(data: dict):
 if __name__ == "__main__":
     import asyncio
 
-    data = {"messages": [{"role": "user", "content": "can you look up treehacks"}]}
+    data = {"messages": [{"role": "user", "content": "Play daily duppy central cee"}]}
     print(asyncio.run(call_openai_endpoint(data)))
