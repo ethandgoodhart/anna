@@ -167,6 +167,23 @@ TOOLS = [
                 }
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "call",
+            "description": "Make a call to a specified phone number",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "phone_number": {
+                        "type": "string",
+                        "description": "The recipient's phone number",
+                    }
+                },
+                "required": ["phone_number"]
+            }
+        }
     }
 ]
 

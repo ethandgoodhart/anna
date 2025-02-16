@@ -33,7 +33,7 @@ const fastify = Fastify();
 fastify.register(fastifyFormBody);
 fastify.register(fastifyWs);
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 9000;
 
 // Root route for health check
 fastify.get('/', async (_, reply) => {
@@ -80,7 +80,7 @@ fastify.post('/outbound-call', async (request, reply) => {
     const call = await twilioClient.calls.create({
       from: TWILIO_PHONE_NUMBER,
       to: number,
-      url: `https://${request.headers.host}/outbound-call-twiml?prompt=${encodeURIComponent(
+      url: `https://6db5-2607-f6d0-ced-5bb-9d89-5c92-9244-66fb.ngrok-free.app/outbound-call-twiml?prompt=${encodeURIComponent(
         prompt
       )}&first_message=${encodeURIComponent(first_message)}`,
     });

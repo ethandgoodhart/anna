@@ -22,7 +22,8 @@
     "dependencies": {
         "@daily-co/daily-js": "^0.73.0",
         "@hono/node-server": "^1.13.8",
-        "lucide-react": "^0.475.0"
+        "lucide-react": "^0.475.0",
+        "react-dom": "^19.0.0"
     },
     "devDependencies": {
         "electron": "^29.1.0",
