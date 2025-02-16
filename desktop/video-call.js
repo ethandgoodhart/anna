@@ -136,6 +136,9 @@ document.getElementById("leave-videocall").onclick = leaveChannel;
 
 window.ipcRenderer.on('webhook-event',async (event, data) => {
     console.log(data.serviceName, 'chat');
+    if (data.serviceName != "holochat") {
+        return;
+    }
     // hide call container
     document.getElementById('callContainer').style.display = 'none';
     window.daily.leave()

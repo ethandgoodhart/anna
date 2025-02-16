@@ -228,7 +228,7 @@ payload = {
         },
         "llm": {
             "model": "gpt-4o",
-            "base_url": "https://0bb6-2607-f6d0-ced-5bb-9d89-5c92-9244-66fb.ngrok-free.app",
+            "base_url": "https://proxy.dhr.wtf",
             "tools": TOOLS,
             "api_key": "none",
             "speculative_inference": True
