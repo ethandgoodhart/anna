@@ -28,7 +28,8 @@ const fragmentShaderSource = `
     void main() {
         vec4 color = texture2D(u_image, v_texCoord);
         float diff = length(color.rgb - u_keyColor);
-        gl_FragColor = diff < u_threshold ? vec4(0.0) : color;
+        float alpha = smoothstep(u_threshold - 0.1, u_threshold + 0.1, diff);
+        gl_FragColor = vec4(color.rgb, alpha);
     }
 `;
 
@@ -144,7 +145,7 @@ function setupVideoProcessing() {
 
             gl.uniform1i(webGLContext.imageLocation, 0);
             gl.uniform3f(webGLContext.keyColorLocation, 0/255, 255/255, 155/255);
-            gl.uniform1f(webGLContext.thresholdLocation, 0.85);
+            gl.uniform1f(webGLContext.thresholdLocation, 0.75); // Reduced threshold for less sensitivity
 
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         }

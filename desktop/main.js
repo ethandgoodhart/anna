@@ -24,7 +24,7 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile('index.test.html');
+  mainWindow.loadFile('index.html');
   
   // Uncomment to open DevTools on startup
   // mainWindow.webContents.openDevTools();
@@ -41,7 +41,7 @@ app.on('window-all-closed', () => {
 
 server.post('/webhook', async (c) => {
   const jsonBody = await c.req.json();
-  const { type, data } = jsonBody;
+  const { type, data } = jsonBody.data;
   console.log("RECEIVED WEBHOOK",type, data)
   mainWindow?.webContents.send('webhook-event', {
     serviceName: type,
