@@ -41,7 +41,7 @@ app.on('window-all-closed', () => {
 
 server.post('/webhook', async (c) => {
   const jsonBody = await c.req.json();
-  const { type, data } = jsonBody.data;
+  const { type, data } = jsonBody;
   console.log("RECEIVED WEBHOOK",type, data)
   mainWindow?.webContents.send('webhook-event', {
     serviceName: type,
@@ -70,11 +70,11 @@ ipcMain.handle('create-conversation', async (event, token) => {
         'x-api-key': "a335c04a5be24585af0ddae7e08c40e5"
       },
       body: JSON.stringify({
-        persona_id: 'p91850b706d1',
-        replica_id: "r315bff4de",
-        properties: {
-          apply_greenscreen: true
-        }
+        persona_id: 'pd25be3280bb',
+        replica_id: "ra32c0504006",
+        // properties: {
+        //   apply_greenscreen: true
+        // }
       })
     });
 

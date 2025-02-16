@@ -192,3 +192,49 @@ INSTRUCTIONS = f"""Say hello to the user and help them with their requests."""
 
 if __name__ == "__main__":
     print(os.getenv("TAVUS_API_KEY"))
+
+
+import requests
+
+url = "https://tavusapi.com/v2/personas"
+
+payload = {
+    "layers": {
+        "stt": {
+            "participant_interrupt_sensitivity": "medium",
+            "stt_engine": "tavus-advanced",
+            "participant_pause_sensitivity": "medium",
+            "smart_turn_detection": True,
+            "hotwords": "ethan or anna"
+        },
+        "llm": {
+            "model": "gpt-4o-mini",
+            "base_url": "https://proxy.dhr.wtf",
+            "tools": TOOLS,
+            "api_key": "none",
+            "speculative_inference": True
+        },
+        "tts": {
+            "tts_engine": "elevenlabs",
+            "api_key": "sk_c582efd83eb89804f3dbcb5228261fccbd7a048d249f80a5",
+            "external_voice_id": "zuyhdfIJfykSAcc7orW6"
+        },
+         "vqa": {
+            "enable_vision": "true",
+            "prompt": "Compliment the user sometimes, also start talking when the user's lips are closedis just staring at you."
+        },
+    },
+    "persona_name": "anna2",
+    "system_prompt": "You are a digital assistant. But a friendly one, a little funny sometimes, laugh, smile, be helpful. you just have to make sure that you do the things that the user wants you to do. You are at Treehacks, a hackathon at Stanford, and made by a team of ambitious students wanting to revolutionalise ",
+    "default_replica_id": "ra32c0504006",
+    "context": "You may be asked to call people. Here's a list of people: [Arihan: ‭+1 (214) 809-8165‬, Ethan: ‭+1 (404) 663-5506‬, Dhravya: +1 602 2977 833, Keval: +1 602 8137978].  "
+}
+headers = {
+    "x-api-key": "a335c04a5be24585af0ddae7e08c40e5",
+    "Content-Type": "application/json"
+}
+
+if __name__ == "__main__":
+    response = requests.request("POST", url, json=payload, headers=headers)
+
+    print(response.text)

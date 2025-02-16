@@ -23,5 +23,5 @@ async def call_openai_endpoint(data: dict):
 if __name__ == "__main__":
     import asyncio
 
-    data = {"messages": [{"role": "user", "content": "can you look up treehacks"}]}
+    data = {"messages": [{"role": "user", "content": "can you play the next song pls"}]}
     print(asyncio.run(call_openai_endpoint(data)))

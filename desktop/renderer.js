@@ -144,8 +144,9 @@ function setupVideoProcessing() {
             );
 
             gl.uniform1i(webGLContext.imageLocation, 0);
-            gl.uniform3f(webGLContext.keyColorLocation, 0/255, 255/255, 155/255);
-            gl.uniform1f(webGLContext.thresholdLocation, 0.75); // Reduced threshold for less sensitivity
+            // rgba(200, 200, 189, 1)
+            gl.uniform3f(webGLContext.keyColorLocation, 200/255, 200/255, 200/255);
+            gl.uniform1f(webGLContext.thresholdLocation, 0.20); // Reduced threshold for less sensitivity
 
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         }
