@@ -20,14 +20,17 @@ cap = cv2.VideoCapture(0)
 # Store previous hand position and gesture state
 prev_x, prev_y = None, None
 gesture_start_time = None
-GESTURE_THRESHOLD_TIME = 0.05  # Even faster response
-MOVEMENT_THRESHOLD = 0.02    # More sensitive
-CONFIRMATION_FRAMES = 2      # Require fewer frames
+GESTURE_THRESHOLD_TIME = 0.08  # Even faster response
+MOVEMENT_THRESHOLD = 0.06    # More sensitive
+CONFIRMATION_FRAMES = 3    # Require fewer frames
+PINCH_THRESHOLD = 0.05    # Threshold for pinch detection
 gesture_count = 0
 
 # Initialize movement tracking
 current_gesture = None
 performed_gestures = deque(maxlen=5)
+is_pinched = False
+prev_pinch_state = False
 
 while True:
     success, frame = cap.read()
@@ -61,16 +64,45 @@ while True:
         for hand_landmarks in result.multi_hand_landmarks:
             mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
-            # Use index finger tip for tracking
+            # Get thumb and index finger landmarks
+            thumb_tip = hand_landmarks.landmark[4]  # Thumb tip
             index_finger = hand_landmarks.landmark[8]  # Index finger tip
             
-            # Convert normalized coordinates to pixel coordinates
+            # Calculate pinch
+            pinch_distance = np.sqrt(
+                (thumb_tip.x - index_finger.x)**2 + 
+                (thumb_tip.y - index_finger.y)**2
+            )
+            
+            # Draw pinch distance
+            thumb_x = int(thumb_tip.x * frame_width)
+            thumb_y = int(thumb_tip.y * frame_height)
             finger_x = int(index_finger.x * frame_width)
             finger_y = int(index_finger.y * frame_height)
             
-            # Draw current position
+            # Draw thumb and index positions
+            cv2.circle(frame, (thumb_x, thumb_y), 8, (0, 255, 0), -1)
             cv2.circle(frame, (finger_x, finger_y), 8, (0, 255, 0), -1)
+            
+            # Draw line between thumb and index
+            cv2.line(frame, (thumb_x, thumb_y), (finger_x, finger_y), (255, 0, 0), 2)
+            
+            # Display pinch distance for debugging
+            cv2.putText(frame, f"Pinch: {pinch_distance:.3f}", (10, frame_height - 60),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
 
+            # Detect pinch gesture
+            is_pinched = pinch_distance < PINCH_THRESHOLD
+            
+            # Detect pinch state change
+            if is_pinched and not prev_pinch_state:
+                print("\n=== GESTURE PERFORMED: PINCH ===")
+                performed_gestures.appendleft(("Pinch", time.time()))
+                pyautogui.press("space")  # You can change this to any key you want
+            
+            prev_pinch_state = is_pinched
+
+            # Regular movement detection
             if prev_x is not None and prev_y is not None:
                 dx = index_finger.x - prev_x
                 dy = index_finger.y - prev_y
@@ -139,6 +171,7 @@ while True:
         gesture_count = 0
         current_gesture = None
         gesture_start_time = None
+        prev_pinch_state = False
 
     # Show the frame
     cv2.imshow("Hand Gesture Control", frame)
