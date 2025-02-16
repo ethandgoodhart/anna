@@ -1,4 +1,6 @@
 const { ipcRenderer } = require('electron');
+
+window.ipcRenderer = ipcRenderer;
 const DailyIframe = require('@daily-co/daily-js');
 const { createRoot } = require('react-dom/client');
 
@@ -161,6 +163,7 @@ function setupVideoProcessing() {
     };
 }
 
+
 // Event Handlers
 async function startCall() {
     token = "a335c04a5be24585af0ddae7e08c40e5";
@@ -172,13 +175,6 @@ async function startCall() {
         
         currentConversation = await ipcRenderer.invoke('create-conversation', token);
 
-
-        ipcRenderer.on('webhook-event', (event, data) => {
-            console.log(data, event)
-            // Update UI elements
-            document.getElementById('status').innerHTML = data.status
-            document.getElementById('message').innerHTML = data.message
-          })
 
         // Initialize Daily.co
         daily = DailyIframe.createCallObject();

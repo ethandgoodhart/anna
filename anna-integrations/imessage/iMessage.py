@@ -135,7 +135,7 @@ async def get_messages(
 @app.get("/send-message/")
 async def send_message(phone_number: str, message_body: str):
     send_imessage(phone_number, message_body)
-    return {"status": "Message sent successfully"}
+    return {"status": "Message sent successfully", "userName": 'Message sent!', "message": message_body}
 
 
 @app.get("/check-new-messages/")

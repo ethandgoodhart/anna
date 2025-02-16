@@ -39,20 +39,18 @@ NGROK_URL = os.getenv("NGROK_URL", "")
 
 def request_handler(route: str, data: dict):
     service = function_mapping[route]
-    # Convert spaces to %20 in track name if present
-    if "track_name" in data:
-        data["track_name"] = data["track_name"].replace(" ", "%20")
-        
+    # Make the request - requests will handle URL encoding automatically
     res = requests.get(
         f"http://localhost:8000/{service}/{route.replace('_', '-')}", params=data
     )
-    data = res.json()
-    print(data)
-
+    response_data = res.text
+    print("responseeeee", response_data)
+    hi = json.loads(response_data)
+    print(hi)
 
     res_data = {
         "event": "route",
-        "data": res.json(),
+        "data": response_data,
     }
 
     llm_string = f"Successfully made a request to {route}"
@@ -156,57 +154,55 @@ async def chat_completions(request: Request):
                                 call_client.send_app_message(app_message)
 
                                 # # Where the TODO comment was - Format response for UI
-                                # formatted_response = {}
-                                # if current_function in function_mapping:
-                                #     service = function_mapping[current_function]
+                                formatted_response = {}
+                                if current_function in function_mapping:
+                                    service = function_mapping[current_function]
                                     
-                                #     if service == "spotify":
-                                #         formatted_response = {
-                                #             "type": "music",
-                                #             "data": {
-                                #                 "songTitle": app_message["data"].get("track_name", "Unknown Track"),
-                                #                 "artist": app_message["data"].get("artist_name", "Unknown Artist"),
-                                #                 "currentTime": "0:00",
-                                #                 "duration": app_message["data"].get("duration", "0:00"),
-                                #                 "progress": app_message["data"].get("progress_ms", 0) / app_message["data"].get("duration_ms", 1) * 100 if app_message["data"].get("duration_ms") else 0,
-                                #                 "albumArt": app_message["data"].get("album_art", "default_album_art_url")
-                                #             }
-                                #         }
-                                #     elif service == "imessage":
-                                #         formatted_response = {
-                                #             "type": "notification",
-                                #             "data": {
-                                #                 "userName": app_message["data"].get("sender", "Unknown User"),
-                                #                 "message": app_message["data"].get("message", "No message content"),
-                                #                 "notificationCount": app_message["data"].get("unread_count", 1)
-                                #             }
-                                #         }
-                                #     elif service == "websearch":
-                                #         formatted_response= {
-                                #             "type": "websearch",
-                                #             "data": {
-                                                
-                                #             }
-                                #         }
+                                    if service == "spotify":
+                                        spotify_data = json.loads(app_message['data'])
+                                        formatted_response = {
+                                            "type": "music",
+                                            "data": {
+                                                "songTitle": spotify_data["name"],
+                                                "artist": spotify_data["artist"],
+                                                "currentTime": "0:00",
+                                                "duration": spotify_data["duration"],
+                                                "progress": 0,
+                                                "albumArt": spotify_data["image"]
+                                            }
+                                        }
+                                    elif service == "imessage":
+                                        print(app_message)
+                                        imessage_data = json.loads(app_message["data"])
+                                        formatted_response = {
+                                            "type": "notification",
+                                            "data": {
+                                                "userName": imessage_data.get("userName", "Unknown User"),
+                                                "message": imessage_data.get("message", "No message content"),
+                                                "notificationCount": 1
+                                            }
+                                        }
+                                    elif service == "websearch":
+                                        print(app_message)
+                                        search_data = json.loads(app_message["data"])
+                                        formatted_response = {
+                                            "type": "websearch",
+                                            "data": {
+                                                "results": search_data["results"],
+                                                "query": search_data["autoprompt_string"],
+                                                "searchType": search_data["resolved_search_type"]
+                                            }
+                                        }
                                     
-                                #     # Update app_message with formatted response
-                                #     app_message["data"] = formatted_response
-                                    
-                                #     # Send the formatted message through the call client
-                                #     # Send webhook to notify UI of updates
-                                #     try:
-                                #         requests.post("http://localhost:8787/webhook", json=app_message)
-                                #     except Exception as e:
-                                #         print(f"Failed to send webhook: {e}")
+                                    # Send the formatted message through the call client
+                                    # Send webhook to notify UI of updates
+                                    try:
+                                        requests.post("http://localhost:3000/webhook", json=formatted_response)
+                                    except Exception as e:
+                                        print(f"Failed to send webhook: {e}")
 
                                 yield f"data: {llm_response.model_dump_json()}\n\n"
 
-                                # TODO: Send webhook here with function execution results
-                                # Example webhook data could include:
-                                # - current_function
-                                # - function_args
-                                # - app_message
-                                # - llm_response
                                 print(current_function, function_args, app_message, llm_response)
 
                                 # Add the tool call result back to messages and continue the conversation

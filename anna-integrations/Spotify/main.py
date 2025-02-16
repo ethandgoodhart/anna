@@ -12,7 +12,8 @@ from .methods import (
 import fastapi
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv("../.env")
+print(os.environ)
 
 app = fastapi.FastAPI()
 
