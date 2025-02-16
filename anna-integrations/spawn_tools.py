@@ -189,7 +189,7 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "pause_track",
-            "description": "Pause the current track on Spotify",
+            "description": "Pause the current track on Spotify. activate this whenever the user says 'pause'",
         },
     },
 ]

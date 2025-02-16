@@ -206,7 +206,7 @@ async def play_playlist_from_query(spotify: Spotify, query: str) -> Spotify:
     playlist_mappings = "\n".join([f"{name}: {id}" for name, id in zip(user_playlists, user_playlist_ids)])
 
     res = client.beta.chat.completions.parse(
-        model="gpt-4o-mini",
+        model="gpt-4o",
         messages=[{
             "role": "user", 
             "content": f"You are a playlist selector. Given a query and a list of playlists with their IDs, return the ID of the playlist that best matches the query. Only return the playlist ID, nothing else.\n\nQuery: {query}\n\nPlaylists:\n{playlist_mappings}"

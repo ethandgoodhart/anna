@@ -35,9 +35,26 @@ function_mapping = {
     "call": "phone",
 }
 
+# Track last function call times
+last_function_calls = {}
+
 app = FastAPI()
 NGROK_URL = os.getenv("NGROK_URL", "")
 
+
+def get_conversation_url():
+    url = "https://tavusapi.com/v2/conversations"
+    headers = {"x-api-key": os.getenv("TAVUS_API_KEY")}
+    response = requests.request("GET", url, headers=headers)
+    print(response.json())
+    return response.json()["data"][0]["conversation_url"]
+
+def get_conversation_id():
+    url = "https://tavusapi.com/v2/conversations"
+    headers = {"x-api-key": os.getenv("TAVUS_API_KEY")}
+    response = requests.request("GET", url, headers=headers)
+    print(response.json())
+    return response.json()["data"][0]["conversation_id"]
 
 def request_handler(route: str, data: dict):
     service = function_mapping[route]
@@ -62,7 +79,7 @@ def request_handler(route: str, data: dict):
             "id": "0",
             "object": "chat.completion.chunk",
             "created": int(time.time()),
-            "model": "gpt-4o-mini",
+            "model": "gpt-4o",
             "choices": [
                 Choice(
                     **{
@@ -77,13 +94,6 @@ def request_handler(route: str, data: dict):
 
     return res_data, chunk
 
-
-def get_conversation_url():
-    url = "https://tavusapi.com/v2/conversations"
-    headers = {"x-api-key": os.getenv("TAVUS_API_KEY")}
-    response = requests.request("GET", url, headers=headers)
-    print(response.json())
-    return response.json()["data"][0]["conversation_url"]
 
 
 call_client = None
@@ -110,7 +120,7 @@ async def chat_completions(request: Request):
 
         # Extract relevant information from the request
         messages = data.get("messages", [])
-        model = "gpt-4o-mini"
+        model = "gpt-4o"
         tools = data.get("tools", TOOLS)
 
         cerebras_response = client.chat.completions.create(
@@ -144,7 +154,35 @@ async def chat_completions(request: Request):
                     if chunk.choices[0].finish_reason == "tool_calls":
                         try:
                             print(f"FUNCTION ARGS BUFFER: {function_args_buffer}")
-                            function_args = json.loads(function_args_buffer)
+                            
+                            # Handle multiple JSON objects in buffer
+                            try:
+                                # Try to parse as single JSON first
+                                function_args = json.loads(function_args_buffer)
+                            except json.JSONDecodeError:
+                                # If that fails, try to find the last valid JSON object
+                                json_objects = [obj for obj in function_args_buffer.split("}{")]
+                                if len(json_objects) > 1:
+                                    # Add back the brackets we split on
+                                    json_objects = [obj if obj.startswith("{") else "{" + obj for obj in json_objects]
+                                    json_objects = [obj if obj.endswith("}") else obj + "}" for obj in json_objects]
+                                    # Take the last valid JSON object
+                                    for obj in reversed(json_objects):
+                                        try:
+                                            function_args = json.loads(obj)
+                                            break
+                                        except json.JSONDecodeError:
+                                            continue
+                                else:
+                                    raise
+
+                            # Check if function was called recently
+                            current_time = time.time()
+                            if current_function in last_function_calls:
+                                if current_time - last_function_calls[current_function] < 10:
+                                    print(f"Skipping {current_function} - called too recently")
+                                    continue
+                            
                             if current_function in function_mapping:
                                 print(
                                     f"RUNNING {current_function}({', '.join([f'{k}={v}' for k, v in function_args.items()])})"
@@ -152,10 +190,21 @@ async def chat_completions(request: Request):
                                 app_message, llm_response = request_handler(
                                     current_function, function_args
                                 )
+                                
+                                # Update last call time
+                                last_function_calls[current_function] = current_time
+                                
                                 print(f"SENDING APP MESSAGE: {app_message}")
-                                call_client.send_app_message(app_message)
+                                call_client.send_app_message({
+                                    "message_type": "conversation",
+                                    "event_type": "conversation.overwrite_llm_context", 
+                                    "conversation_id": "c123456",
+                                    "properties": {
+                                        "context": app_message
+                                    }
+                                })
 
-                                # # Where the TODO comment was - Format response for UI
+                                # Format response for UI
                                 formatted_response = {}
                                 if current_function in function_mapping:
                                     service = function_mapping[current_function]
@@ -185,8 +234,7 @@ async def chat_completions(request: Request):
                                             }
                                         }
                                     elif service == "websearch":
-                                        print(app_message)
-                                        search_data = json.loads(app_message["data"])
+                                        search_data = json.loads(app_message['data'])
                                         formatted_response = {
                                             "type": "websearch",
                                             "data": {
