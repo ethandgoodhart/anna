@@ -160,6 +160,28 @@
             background-color: #cccccc;
             cursor: not-allowed;
         }
+
+        .video-containers {
+            position: relative;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #local-video-container {
+            width: 50vw;
+            height: 65vh;
+        }
+
+        #remote-video-container {
+            width: 50vw;
+            height: 65vh;
+        }
+
     </style>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -167,6 +189,8 @@
     <main class="overflow-hidden">
         <div class="token-form" id="startForm">
             <button id="startButton" class="start-button">Start Video Call</button>
+            <button id="join-videocall">Join Call</button>
+            <button id="leave-videocall">Leave Call</button>
         </div>
         <div id="callContainer" class="video-container" style="display: none;">
             <div class="video-wrapper">
@@ -178,12 +202,21 @@
                 <div class="controls">
                     <button id="toggleMic">Mic is On</button>
                     <button id="leaveCall">Leave</button>
+                    <button id="startButton">Start Call</button>
+                    <button id="endCallBtn">End Call</button>
                 </div>
+
             </div>
+        </div>
+
+        <div class="video-containers">
+            <div id="local-video-container"></div>
+            <!-- <div id="remote-video-container"></div> -->
         </div>
     </main>
 
     <script src="./load-react.js" type="text/babel"></script>
     <script src="./renderer.js"></script>
+    <script type="module" src="./video-call.js"></script>
 </body>
 </html>
