@@ -73,9 +73,9 @@ ipcMain.handle('create-conversation', async (event, token) => {
         persona_id: 'p870634e3f41', 
         replica_id: "ra32c0504006",
         properties: {
-          max_call_duration: 60*15,
-          participant_left_timeout: 20,
-          participant_absent_timeout: 60*2
+          max_call_duration: 60*20,
+          participant_left_timeout: 60*20,
+          participant_absent_timeout: 60*20
         }
       })
     });
