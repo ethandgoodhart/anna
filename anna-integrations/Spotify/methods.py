@@ -40,7 +40,7 @@ async def play_track(spotify: Spotify, uri: str) -> Spotify:
     plays the track with the given uri
     """
     try:
-        spotify.volume(100)
+        spotify.volume(50)
         return spotify.start_playback(uris=[uri])
     except Exception as e:
         if "The access token expired" in str(e):
