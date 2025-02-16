@@ -33,7 +33,8 @@ function_mapping = {
     "check_new_messages": "imessage",
     "get_messages": "imessage",
     "call": "phone",
-    "start_holochat": "holochat"
+    "start_holochat": "holochat",
+    "upcoming_assignments": "canvas"
 }
 
 # Track last function call times
@@ -59,10 +60,13 @@ def get_conversation_id():
 
 def request_handler(route: str, data: dict):
     service = function_mapping[route]
-    # Make the request - requests will handle URL encoding automatically
-    res = requests.get(
-        f"http://localhost:8000/{service}/{route.replace('_', '-')}", params=data
-    )
+    # For upcoming_assignments, we don't need to pass any params
+    if route == "upcoming_assignments" or route == "pause_track":
+        res = requests.get(f"http://localhost:8000/{service}/{route.replace('_', '-')}")
+    else:
+        res = requests.get(
+            f"http://localhost:8000/{service}/{route.replace('_', '-')}", params=data
+        )
 
     if res.text == "":
         return None, None
@@ -78,6 +82,11 @@ def request_handler(route: str, data: dict):
     }
 
     llm_string = f"Successfully made a request to {route}"
+    if route == "upcoming_assignments":
+        assignments = json.loads(response_data)
+        llm_string = "Here are your upcoming assignments:\n"
+        for assignment in assignments:
+            llm_string += f"- {assignment['assignment']} for {assignment['class']}, due {assignment['due_at']}\n"
 
     chunk = ChatCompletionChunk(
         **{
@@ -146,8 +155,10 @@ async def chat_completions(request: Request):
                         tool_call = chunk.choices[0].delta.tool_calls[0]
 
                         if tool_call.function.name:
+                            # Reset buffer when we start a new function call
                             current_function = tool_call.function.name
                             current_tool_call_id = tool_call.id
+                            function_args_buffer = ""
 
                         if tool_call.function.arguments:
                             function_args_buffer += tool_call.function.arguments
@@ -174,8 +185,10 @@ async def chat_completions(request: Request):
                                     end_idx = cleaned_buffer.find("}") + 1
                                     if start_idx != -1 and end_idx != -1:
                                         function_args = json.loads(cleaned_buffer[start_idx:end_idx])
-                                    else:
-                                        print(f"No arguments needed for {current_function}")
+                            
+                            # Special handling for functions that don't need arguments
+                            # if current_function == "upcoming_assignments":
+                            #     function_args = {}  # Explicitly set empty dict for this function
 
                             # Check if function was called recently
                             current_time = time.time()
@@ -249,6 +262,14 @@ async def chat_completions(request: Request):
                                             "type": "holochat",
                                             "data": ""
                                         }
+                                    # elif service == "canvas":
+                                    #     assignments_data = json.loads(app_message['data'])
+                                    #     formatted_response = {
+                                    #         "type": "assignments",
+                                    #         "data": {
+                                    #             "assignments": assignments_data
+                                    #         }
+                                    #     }
                                     
                                     # Send the formatted message through the call client
                                     # Send webhook to notify UI of updates

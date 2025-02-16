@@ -1,8 +1,9 @@
 import fastapi
 from imessage.iMessage import app as imessage_app
-from Spotify.main import app as spotify_app
+from spotify.main import app as spotify_app
 from websearch.main import app as websearch_app
 from phone.main import app as phone_app
+from canvas.main import app as canvas_app
 import subprocess
 import os
 
@@ -12,6 +13,7 @@ app.mount("/imessage", imessage_app)
 app.mount("/spotify", spotify_app)
 app.mount("/websearch", websearch_app)
 app.mount("/phone", phone_app)
+app.mount("/canvas", canvas_app)
 
 if __name__ == "__main__":
     import uvicorn

@@ -195,6 +195,13 @@ TOOLS = [
     {
         "type": "function",
         "function": {
+            "name": "upcoming_assignments",
+            "description": "Get the upcoming assignments from the user's courses",
+        },
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "start_holochat",
             "description": "Starts a hologram chat with someone. Trigger every time someone says 'holochat'"
         }
@@ -221,7 +228,7 @@ payload = {
         },
         "llm": {
             "model": "gpt-4o",
-            "base_url": "https://f3fd-2607-f6d0-ced-5bb-9d89-5c92-9244-66fb.ngrok-free.app",
+            "base_url": "https://0bb6-2607-f6d0-ced-5bb-9d89-5c92-9244-66fb.ngrok-free.app",
             "tools": TOOLS,
             "api_key": "none",
             "speculative_inference": True
@@ -236,7 +243,7 @@ payload = {
             "prompt": "Compliment the user sometimes, also start talking when the user's lips are closedis just staring at you."
         },
     },
-    "persona_name": "anna-test",
+    "persona_name": "anna-again",
     "system_prompt": "You are a digital assistant. But a friendly one, a little funny sometimes, laugh, smile, be helpful. you just have to make sure that you do the things that the user wants you to do. You are at Treehacks, a hackathon at Stanford, and made by a team of ambitious students wanting to revolutionalise ",
     "default_replica_id": "ra32c0504006",
     "context": "You may be asked to call people. Here's a list of people: [Arihan: ‭+1 (214) 809-8165‬, Ethan: ‭+1 (404) 663-5506‬, Dhravya: +1 602 2977 833, Keval: +1 602 8137978].  "
