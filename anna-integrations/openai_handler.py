@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 
 from daily import CallClient, Daily
 
-assert load_dotenv("/Users/arihanvaranasi/Dev/Projects/anna/.env"), "No .env file found"
+load_dotenv()
 
 function_mapping = {
     "play_track": "spotify",
@@ -27,6 +27,10 @@ function_mapping = {
     "previous_track": "spotify",
     "play_random_playlist": "spotify",
     "play_playlist": "spotify",
+    "search": "websearch",
+    "send_message": "imessage",
+    "check_new_messages": "imessage",
+    "get_messages": "imessage",
 }
 
 app = FastAPI()
@@ -136,6 +140,7 @@ async def chat_completions(request: Request):
                     # When we get the finish_reason="tool_calls", the function call is complete
                     if chunk.choices[0].finish_reason == "tool_calls":
                         try:
+                            print(f"FUNCTION ARGS BUFFER: {function_args_buffer}")
                             function_args = json.loads(function_args_buffer)
                             if current_function in function_mapping:
                                 print(
