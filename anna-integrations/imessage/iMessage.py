@@ -132,13 +132,13 @@ async def get_messages(
 
 
 # FastAPI endpoint to send an iMessage
-@app.post("/send_message/")
-async def send_message(request: SendMessageRequest):
-    send_imessage(request.phone_number, request.message_body)
+@app.get("/send-message/")
+async def send_message(phone_number: str, message_body: str):
+    send_imessage(phone_number, message_body)
     return {"status": "Message sent successfully"}
 
 
-@app.get("/check_new_messages/")
+@app.get("/check-new-messages/")
 async def check_new_messages(
     db_location: str = os.getenv("IMESSAGE_DB_LOCATION"),
     last_rowid: Optional[int] = None,
