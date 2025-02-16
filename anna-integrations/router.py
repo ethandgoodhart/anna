@@ -1,6 +1,6 @@
 import fastapi
 from imessage.iMessage import app as imessage_app
-from Spotify.main import app as spotify_app
+from spotify.main import app as spotify_app
 from websearch.main import app as websearch_app
 from phone.main import app as phone_app
 import subprocess
@@ -16,12 +16,12 @@ app.mount("/phone", phone_app)
 if __name__ == "__main__":
     import uvicorn
 
-    # current_dir = os.path.dirname(os.path.abspath(__file__))
-    # node_script_path = os.path.join(current_dir, "phone", "outbound.js")
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    node_script_path = os.path.join(current_dir, "phone", "outbound.js")
     
-    # if not os.path.exists(os.path.join(current_dir, "phone", "node_modules")):
-    #     subprocess.run(["bun", "i"], cwd=os.path.join(current_dir, "phone"))
+    if not os.path.exists(os.path.join(current_dir, "phone", "node_modules")):
+        subprocess.run(["bun", "i"], cwd=os.path.join(current_dir, "phone"))
 
-    # subprocess.Popen(["bun", node_script_path])
+    subprocess.Popen(["bun", node_script_path])
 
     uvicorn.run(app, host="0.0.0.0", port=8000)

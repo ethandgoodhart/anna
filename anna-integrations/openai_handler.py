@@ -31,6 +31,7 @@ function_mapping = {
     "send_message": "imessage",
     "check_new_messages": "imessage",
     "get_messages": "imessage",
+    "call": "phone",
 }
 
 app = FastAPI()
