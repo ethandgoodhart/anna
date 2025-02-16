@@ -20,9 +20,5 @@ async def call(phone_number: str):
     return {"called": phone_number}
 
 if __name__ == "__main__":
-    # import uvicorn
-
-    # uvicorn.run(app, host="0.0.0.0", port=8000)
-
     asyncio.run(call("+12148098165"))
 

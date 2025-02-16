@@ -4,7 +4,7 @@ import os
 
 
 async def call_openai_endpoint(data: dict):
-    url = "http://localhost:8080"
+    url = "https://proxy.dhr.wtf"
 
     client = OpenAI(api_key="hi", base_url=url)
 
@@ -23,5 +23,5 @@ async def call_openai_endpoint(data: dict):
 if __name__ == "__main__":
     import asyncio
 
-    data = {"messages": [{"role": "user", "content": "can you play the next song pls"}]}
+    data = {"messages": [{"role": "user", "content": "pause the track"}]}
     print(asyncio.run(call_openai_endpoint(data)))

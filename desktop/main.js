@@ -72,9 +72,12 @@ ipcMain.handle('create-conversation', async (event, token) => {
       body: JSON.stringify({
         persona_id: 'pd25be3280bb',
         replica_id: "ra32c0504006",
-        // properties: {
-        //   apply_greenscreen: true
-        // }
+        properties: {
+          max_call_duration: 60*15,
+          participant_left_timeout: 20,
+          participant_absent_timeout: 60*2
+        }
+
       })
     });
 

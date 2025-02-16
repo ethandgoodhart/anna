@@ -40,12 +40,23 @@ async def play_track(spotify: Spotify, uri: str) -> Spotify:
     plays the track with the given uri
     """
     try:
+        spotify.volume(100)
         return spotify.start_playback(uris=[uri])
     except Exception as e:
         if "The access token expired" in str(e):
             spotify = reauthorize_spotify()
             return spotify.start_playback(uris=[uri])
         raise e
+    
+async def pause_track(spotify: Spotify) -> Spotify:
+    """
+    pauses the current track
+    """
+    spotify.volume(0)
+    await spotify.pause_playback()    
+
+    return {"response": "paused"}
+        
 
 async def get_current_track(spotify: Spotify) -> Spotify:
     """
@@ -178,9 +189,11 @@ async def play_random_playlist(spotify: Spotify) -> Spotify:
     plays a random playlist
     """
     playlists, playlist_ids = await get_user_playlists(spotify)
-    return await play_playlist(
+    await play_playlist(
         spotify, playlist_ids[random.randint(0, len(playlist_ids) - 1)]
     )
+
+    return await get_current_track(spotify)
 
 async def play_playlist_from_query(spotify: Spotify, query: str) -> Spotify:
     """
@@ -202,4 +215,6 @@ async def play_playlist_from_query(spotify: Spotify, query: str) -> Spotify:
         response_format=PlaylistId,
     )
 
-    return await play_playlist(spotify, res.choices[0].message.parsed.playlist_id)
+    await play_playlist(spotify, res.choices[0].message.parsed.playlist_id)
+
+    return await get_current_track(spotify)
