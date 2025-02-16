@@ -2,6 +2,7 @@ import cv2
 import mediapipe as mp
 import pyautogui
 import time
+import numpy as np
 
 # Initialize MediaPipe Hands
 mp_hands = mp.solutions.hands
@@ -11,15 +12,17 @@ hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7, min_tracki
 # Initialize video capture
 cap = cv2.VideoCapture(0)
 
-# Store previous hand position
+# Store previous hand position and gesture state
 prev_x, prev_y = None, None
 gesture_start_time = None
 GESTURE_THRESHOLD_TIME = 0.2  # Time threshold to register a gesture
 MOVEMENT_THRESHOLD = 0.1  # Movement threshold to detect significant gestures
 
+
 while True:
     _, frame = cap.read()
     frame = cv2.flip(frame, 1)  # Mirror image
+
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
     # Process frame with MediaPipe
@@ -32,6 +35,7 @@ while True:
             # Get the x, y coordinates of the wrist (landmark 0)
             wrist_x = hand_landmarks.landmark[0].x
             wrist_y = hand_landmarks.landmark[0].y
+
 
             if prev_x is not None and prev_y is not None:
                 dx = wrist_x - prev_x
