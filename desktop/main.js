@@ -77,7 +77,6 @@ ipcMain.handle('create-conversation', async (event, token) => {
           participant_left_timeout: 20,
           participant_absent_timeout: 60*2
         }
-
       })
     });
 
