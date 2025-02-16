@@ -8,7 +8,7 @@
 		"**/.server/**/*.tsx",
 		"**/.client/**/*.ts",
 		"**/.client/**/*.tsx"
-, "desktop/main.js"	],
+, "desktop/main.js", "app/src/renderer.js", "app/src/app.jsx", "desktop/ui/notification-card.cjs"	],
 	"compilerOptions": {
 		"lib": ["DOM", "DOM.Iterable", "ES2022"],
 		"types": [
