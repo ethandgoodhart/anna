@@ -74,8 +74,8 @@ ipcMain.handle('create-conversation', async (event, token) => {
         replica_id: "ra32c0504006",
         properties: {
           max_call_duration: 60*20,
-          participant_left_timeout: 60*20,
-          participant_absent_timeout: 60*20
+          // participant_left_timeout: 60*20,
+          // participant_absent_timeout: 60*20
         }
       })
     });

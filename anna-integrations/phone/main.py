@@ -3,8 +3,8 @@ import requests
 import asyncio
 app = fastapi.FastAPI()
 
-prompt = "You are a car sales agent. You are calling to sell a new car to the customer. Be friendly and professional and answer all questions."
-first_message = "Hello, my name is Eric, I heard you were looking for a new car! What model and color are you looking for?"
+prompt = "You are a digital assistant. But a friendly one, a little funny sometimes, laugh, smile, be helpful. you just have to make sure that you do the things that the user wants you to do. You are at Treehacks, a hackathon at Stanford, and made by a team of ambitious students wanting to revolutionalise "
+first_message = "Hello, i am Ethan, how are you?"
 
 
 @app.get("/call")

@@ -1,5 +1,3 @@
-
-
 const Widgets = () => {
   const [notifications, setNotifications] = React.useState([]);
 
@@ -222,21 +220,14 @@ function MusicPlayerNotification({
   React.useEffect(() => {
     const interval = setInterval(() => {
       setElapsedMs(prev => {
-        if (prev >= durationMs) {
-          clearInterval(interval);
-          return prev;
-        }
-        return prev + 1000;
-      });
-
-      setProgress(prev => {
-        const newProgress = (elapsedMs / durationMs) * 100;
-        return Math.min(newProgress, 100);
+        const newTime = prev >= durationMs ? prev : prev + 1000;
+        setProgress((newTime / durationMs) * 100);
+        return newTime;
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [durationMs, elapsedMs]);
+  }, [durationMs]);
 
   const formatTime = (ms) => {
     if (!ms || isNaN(ms)) return "0:00";
@@ -305,7 +296,7 @@ function MusicPlayerNotification({
 
       <div className="flex justify-center items-center gap-12" style={{ transform: "translateZ(25px)" }}>
         <button
-          className="text-[#00ffff] transform rotate-180 hover:scale-110 transition-all duration-300"
+          className="text-[#00ffff] hover:scale-110 transition-all duration-300"
           aria-label="Previous track"
           style={{ 
             filter: "drop-shadow(0 4px 8px rgba(0,255,255,0.3))",
@@ -313,7 +304,7 @@ function MusicPlayerNotification({
           }}
         >
           <svg
-            className="w-[70px] h-[42px]"
+            className="w-[70px] h-[42px] rotate-180"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
             fill="currentColor"
