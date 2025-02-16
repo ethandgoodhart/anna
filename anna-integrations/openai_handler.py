@@ -62,8 +62,12 @@ def request_handler(route: str, data: dict):
     res = requests.get(
         f"http://localhost:8000/{service}/{route.replace('_', '-')}", params=data
     )
+
+    if res.text == "":
+        return None, None
     response_data = res.text
     print("responseeeee", response_data)
+
     hi = json.loads(response_data)
     print(hi)
 
@@ -155,26 +159,22 @@ async def chat_completions(request: Request):
                         try:
                             print(f"FUNCTION ARGS BUFFER: {function_args_buffer}")
                             
-                            # Handle multiple JSON objects in buffer
-                            try:
-                                # Try to parse as single JSON first
-                                function_args = json.loads(function_args_buffer)
-                            except json.JSONDecodeError:
-                                # If that fails, try to find the last valid JSON object
-                                json_objects = [obj for obj in function_args_buffer.split("}{")]
-                                if len(json_objects) > 1:
-                                    # Add back the brackets we split on
-                                    json_objects = [obj if obj.startswith("{") else "{" + obj for obj in json_objects]
-                                    json_objects = [obj if obj.endswith("}") else obj + "}" for obj in json_objects]
-                                    # Take the last valid JSON object
-                                    for obj in reversed(json_objects):
-                                        try:
-                                            function_args = json.loads(obj)
-                                            break
-                                        except json.JSONDecodeError:
-                                            continue
-                                else:
-                                    raise
+                            # Initialize empty dict for functions that don't need arguments
+                            function_args = {}
+                            
+                            # Only try to parse if there's actual content and not empty brackets
+                            if function_args_buffer.strip() and function_args_buffer.strip() != "{}":
+                                cleaned_buffer = function_args_buffer.replace("{}", "").strip()
+                                
+                                try:
+                                    function_args = json.loads(cleaned_buffer)
+                                except json.JSONDecodeError:
+                                    start_idx = cleaned_buffer.find("{")
+                                    end_idx = cleaned_buffer.find("}") + 1
+                                    if start_idx != -1 and end_idx != -1:
+                                        function_args = json.loads(cleaned_buffer[start_idx:end_idx])
+                                    else:
+                                        print(f"No arguments needed for {current_function}")
 
                             # Check if function was called recently
                             current_time = time.time()
@@ -321,6 +321,10 @@ async def chat_completions(request: Request):
             except Exception as e:
                 print(traceback.format_exc())
                 yield json.dumps({"error": str(e)})
+            finally:
+                function_args_buffer = ""
+                current_function = None
+                current_tool_call_id = None
 
         return StreamingResponse(generate(), media_type="text/plain")
     except Exception as e:

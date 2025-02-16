@@ -70,12 +70,12 @@ ipcMain.handle('create-conversation', async (event, token) => {
         'x-api-key': "a335c04a5be24585af0ddae7e08c40e5"
       },
       body: JSON.stringify({
-        persona_id: 'p8352baf4a51', 
+        persona_id: 'pe8f873572d8', 
         replica_id: "ra32c0504006",
         properties: {
-          max_call_duration: 60*15,
-          participant_left_timeout: 20,
-          participant_absent_timeout: 60*2
+          max_call_duration: 60*20,
+          participant_left_timeout: 60*20,
+          participant_absent_timeout: 60*20
         }
       })
     });
