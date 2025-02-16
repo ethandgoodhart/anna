@@ -145,8 +145,8 @@ function setupVideoProcessing() {
 
             gl.uniform1i(webGLContext.imageLocation, 0);
             // rgba(200, 200, 189, 1)
-            gl.uniform3f(webGLContext.keyColorLocation, 200/255, 200/255, 200/255);
-            gl.uniform1f(webGLContext.thresholdLocation, 0.30); // Reduced threshold for less sensitivity
+            gl.uniform3f(webGLContext.keyColorLocation, 200/255, 200/255, 180/255);
+            gl.uniform1f(webGLContext.thresholdLocation, 0.25); // Reduced threshold for less sensitivity
 
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         }
@@ -169,6 +169,10 @@ function setupVideoProcessing() {
 // Event Handlers
 async function startCall() {
     token = "a335c04a5be24585af0ddae7e08c40e5";
+        // hide call container
+        document.getElementById('agora-call').style.display = 'none';
+        // show agora call container
+        document.getElementById('callContainer').style.display = 'block';
 
     try {
         // Create Daily room
@@ -177,12 +181,16 @@ async function startCall() {
         
         currentConversation = await ipcRenderer.invoke('create-conversation', token);
 
+        window.conversationId = currentConversation.conversation_id;
+
 
         // Initialize Daily.co
         daily = DailyIframe.createCallObject();
         
         // Join the call
         await daily.join({ url: currentConversation.conversation_url });
+
+        window.daily = daily;
         
         // Show call container and hide token form
         // document.getElementById('tokenForm').style.display = 'none';
@@ -334,5 +342,10 @@ document.getElementById('startButton').addEventListener('click', async () => {
 window.addEventListener('unload', () => {
     if (daily) {
         daily.leave();
+        // send an ipc event to end-conversation
+        ipcRenderer.send('end-conversation', {
+            conversationId: currentConversation.conversation_id,
+            token
+        });
     }
 });

@@ -70,7 +70,7 @@ ipcMain.handle('create-conversation', async (event, token) => {
         'x-api-key': "a335c04a5be24585af0ddae7e08c40e5"
       },
       body: JSON.stringify({
-        persona_id: 'p8352baf4a51', 
+        persona_id: 'p870634e3f41', 
         replica_id: "ra32c0504006",
         properties: {
           max_call_duration: 60*15,
@@ -92,14 +92,14 @@ ipcMain.handle('create-conversation', async (event, token) => {
   }
 });
 
-ipcMain.handle('end-conversation', async (event, { conversationId, token }) => {
+ipcMain.handle('end-conversation', async (event, { conversationId }) => {
   try {
     const response = await fetch(
       `https://tavusapi.com/v2/conversations/${conversationId}/end`,
       {
         method: 'POST',
         headers: {
-          'x-api-key': token
+          'x-api-key': "a335c04a5be24585af0ddae7e08c40e5"
         }
       }
     );

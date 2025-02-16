@@ -192,10 +192,17 @@ TOOLS = [
             "description": "Pause the current track on Spotify. activate this whenever the user says 'pause'",
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "start_holochat",
+            "description": "Starts a hologram chat with someone. Trigger every time someone says 'holochat'"
+        }
+    }
 ]
 
 
-INSTRUCTIONS = f"""Say hello to the user and help them with their requests."""
+INSTRUCTIONS = f"""Say hello to the user and help them with their requests. For things like start holochat, just run the start_holochat tool"""
 
 if __name__ == "__main__":
     print(os.getenv("TAVUS_API_KEY"))

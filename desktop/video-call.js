@@ -86,7 +86,26 @@ function displayRemoteVideo(user) {
     remoteVideoTrack.play(remotePlayerContainer);
 }
 
-// Leave the channel and clean up
+// Add these new functions at the top level of the file
+function showVideoCall() {
+    document.getElementById('callContainer').style.display = 'none';
+    document.getElementById('agora-call').style.display = 'block';
+    // Assuming there's a function to mute Tavus avatar
+    if (typeof window.muteTavusAudio === 'function') {
+        window.muteTavusAudio();
+    }
+}
+
+function hideVideoCall() {
+    document.getElementById('callContainer').style.display = 'block';
+    document.getElementById('agora-call').style.display = 'none';
+    // Assuming there's a function to unmute Tavus avatar
+    if (typeof window.unmuteTavusAudio === 'function') {
+        window.unmuteTavusAudio();
+    }
+}
+
+// Modify the leaveChannel function
 async function leaveChannel() {
     // Close local tracks
     localAudioTrack.close();
@@ -114,3 +133,22 @@ document.getElementById("join-videocall").onclick = async () => {
 };
 
 document.getElementById("leave-videocall").onclick = leaveChannel;
+
+window.ipcRenderer.on('webhook-event',async (event, data) => {
+    console.log(data.serviceName, 'chat');
+    // hide call container
+    document.getElementById('callContainer').style.display = 'none';
+    window.daily.leave()
+    // end the conversation
+    window.ipcRenderer.send('end-conversation', {
+        conversationId: window.conversationId,
+        token: "a335c04a5be24585af0ddae7e08c40e5"
+    });
+
+    // show agora call container
+    document.getElementById('agora-call').style.display = 'block';
+    if (!client) {
+        initializeClient();
+    }
+    await joinChannel();
+});

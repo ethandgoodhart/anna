@@ -33,6 +33,7 @@ function_mapping = {
     "check_new_messages": "imessage",
     "get_messages": "imessage",
     "call": "phone",
+    "start_holochat": "holochat"
 }
 
 # Track last function call times
@@ -242,6 +243,11 @@ async def chat_completions(request: Request):
                                                 "query": search_data["autoprompt_string"],
                                                 "searchType": search_data["resolved_search_type"]
                                             }
+                                        }
+                                    elif service == "holochat":
+                                        formatted_response = {
+                                            "type": "holochat",
+                                            "data": ""
                                         }
                                     
                                     # Send the formatted message through the call client

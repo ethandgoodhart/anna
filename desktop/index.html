@@ -70,30 +70,34 @@
             display: flex;
             flex-direction: row;
             gap: 1rem;
-            position: absolute;
+            position: fixed;
             bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
             padding: 12px 24px;
             border-radius: 8px;
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.5);
+            pointer-events: auto;
         }
 
         .controls button {
             padding: 8px 16px;
-            background: white;
-            border: none;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #00ffff;
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 500;
-            transition: background-color 0.2s;
+            color: #00ffff;
+            filter: drop-shadow(0 4px 8px rgba(0,255,255,0.3));
+            transition: all 0.3s;
+            pointer-events: auto;
         }
 
         .controls button:hover {
-            background: #f0f0f0;
+            transform: scale(1.1);
+            background: rgba(0, 255, 255, 0.1);
         }
 
         canvas {
@@ -173,13 +177,11 @@
         }
 
         #local-video-container {
-            width: 50vw;
-            height: 65vh;
+            height: 100vh;
         }
 
         #remote-video-container {
-            width: 50vw;
-            height: 65vh;
+            height: 100vh;
         }
 
     </style>
@@ -209,14 +211,13 @@
             </div>
         </div>
 
-        <div class="video-containers">
-            <div id="local-video-container"></div>
-            <!-- <div id="remote-video-container"></div> -->
+        <div id="agora-call" class="video-containers">
+            <div id="remote-video-container"></div>
         </div>
     </main>
 
-    <script src="./load-react.js" type="text/babel"></script>
     <script src="./renderer.js"></script>
+    <script src="./load-react.js" type="text/babel"></script>
     <script type="module" src="./video-call.js"></script>
 </body>
 </html>
